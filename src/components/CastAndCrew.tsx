@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { User, ChevronRight, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
@@ -104,37 +105,48 @@ export const CastAndCrew = ({ castAndCrew, showCount = 12 }: CastAndCrewProps) =
       </div>
 
       {/* Cast and Crew Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5">
         {displayedMembers.map((member) => (
           <Card
             key={member.id}
-            className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
+            className="group cursor-pointer overflow-hidden rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
           >
-            <div className="p-4 flex flex-col items-center text-center">
+            <div className="p-5 flex flex-col items-center text-center">
               <div className="relative">
-                <Avatar className="h-24 w-24">
-                  {member.image ? (
-                    <AvatarImage src={member.image} alt={member.name} />
-                  ) : (
-                    <AvatarFallback>
-                      <User className="w-8 h-8 text-muted-foreground" />
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="p-[3px] rounded-full bg-gradient-to-br from-primary/70 via-primary/30 to-transparent">
+                        <Avatar className="h-24 w-24 sm:h-28 sm:w-28 ring-1 ring-border transition-transform duration-300 group-hover:scale-105">
+                          {member.image ? (
+                            <AvatarImage src={member.image} alt={member.name} />
+                          ) : (
+                            <AvatarFallback>
+                              <User className="w-8 h-8 text-muted-foreground" />
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="text-xs">
+                      {member.character || 'Cast'}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
 
                 {/* Role badge */}
                 <div className="absolute -bottom-1 -right-1">
                   <Badge
                     variant="secondary"
-                    className={`text-[10px] px-1.5 py-0.5 ${getRoleBadgeColor(member.role)}`}
+                    className={`text-[10px] px-1.5 py-0.5 shadow ${getRoleBadgeColor(member.role)}`}
                   >
                     {formatRole(member.role)}
                   </Badge>
                 </div>
               </div>
 
-              <div className="mt-3 space-y-1">
-                <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
+              <div className="mt-4 space-y-1">
+                <h3 className="font-semibold text-sm sm:text-base line-clamp-1 group-hover:text-primary transition-colors">
                   {member.name}
                 </h3>
                 <p className="text-xs text-muted-foreground line-clamp-2">

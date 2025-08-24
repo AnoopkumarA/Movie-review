@@ -11,6 +11,8 @@ export interface TmdbMovie {
   genres?: { id: number; name: string }[];
   poster_path: string | null;
   backdrop_path: string | null;
+  budget?: number;
+  revenue?: number;
 }
 
 export interface TmdbReview {
@@ -62,6 +64,18 @@ export const tmdb = {
     const res = await fetch(buildUrl("/movie/popular", { page }));
     if (!res.ok) throw new Error("Failed to fetch popular movies");
     return res.json() as Promise<{ results: TmdbMovie[] }>; 
+  },
+
+  async getTrendingMovies(time_window: 'day' | 'week' = 'day', page = 1) {
+    const res = await fetch(buildUrl(`/trending/movie/${time_window}`, { page }));
+    if (!res.ok) throw new Error("Failed to fetch trending movies");
+    return res.json() as Promise<{ results: TmdbMovie[] }>;
+  },
+
+  async getTopRatedMovies(page = 1) {
+    const res = await fetch(buildUrl(`/movie/top_rated`, { page }));
+    if (!res.ok) throw new Error("Failed to fetch top rated movies");
+    return res.json() as Promise<{ results: TmdbMovie[] }>;
   },
 
   async getMovieDetails(movieId: string | number) {

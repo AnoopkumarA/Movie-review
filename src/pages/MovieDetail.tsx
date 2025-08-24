@@ -13,7 +13,7 @@ import { CastMember } from "@/data/movies";
 import { tmdb, tmdbImageUrl, TmdbMovie, TmdbCredit, TmdbReview } from "@/integrations/tmdb/client";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ThumbsUp, Calendar, User, Star } from "lucide-react";
+import { ThumbsUp, Calendar, User, Star, Clock, Clapperboard, DollarSign, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { TrailerModal } from "@/components/TrailerModal";
 import { youtube } from "@/integrations/youtube/client";
@@ -81,6 +81,19 @@ const MovieDetail = () => {
     setOverallRating(combined);
   };
 
+  const formatCurrency = (value?: number | null) => {
+    if (value == null) return "—";
+    try {
+      return value.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+      });
+    } catch {
+      return `$${value}`;
+    }
+  };
+
   const fetchTmdbData = async () => {
     if (!id) return;
     try {
@@ -142,7 +155,7 @@ const MovieDetail = () => {
             .select('username')
             .eq('user_id', review.user_id)
             .single();
-
+          
           const mapped: UserReview = {
             id: review.id,
             user_id: review.user_id,
@@ -201,11 +214,11 @@ const MovieDetail = () => {
       <Header />
       
       {tmdbMovie && (
-        <MovieHero
+      <MovieHero
           movieId={id!}
           title={tmdbMovie.title}
           description={tmdbMovie.overview}
-          rating={overallRating}
+        rating={overallRating}
           imdbRating={tmdbMovie.vote_average}
           year={tmdbMovie.release_date ? new Date(tmdbMovie.release_date).getFullYear() : 0}
           runtime={formatRuntime(tmdbMovie.runtime)}
@@ -425,26 +438,45 @@ const MovieDetail = () => {
           <h2 className="text-3xl font-bold">Movie Details</h2>
           
           <div className="grid md:grid-cols-2 gap-8">
-            <Card className="p-6 space-y-4">
+            {/* Technical Details - modern stat cards */}
+            <Card className="p-6 bg-gradient-to-br from-background to-primary/5 border border-primary/10 shadow-sm">
+              <div className="flex items-center justify-between mb-5">
               <h3 className="text-xl font-semibold">Technical Details</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Director:</span>
-                  <span>{(creditsCrew.find(c => (c.job || '').toLowerCase() === 'director')?.name) || '—'}</span>
+                <Clapperboard className="w-5 h-5 text-primary" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-3 rounded-xl border bg-card/50 p-4">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                    <Clapperboard className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Director</div>
+                    <div className="font-semibold">{(creditsCrew.find(c => (c.job || '').toLowerCase() === 'director')?.name) || '—'}</div>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Runtime:</span>
-                  <span>{formatRuntime(tmdbMovie?.runtime)}</span>
+                <div className="flex items-center gap-3 rounded-xl border bg-card/50 p-4">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Runtime</div>
+                    <div className="font-semibold">{formatRuntime(tmdbMovie?.runtime)}</div>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Release Year:</span>
-                  <span>{tmdbMovie?.release_date ? new Date(tmdbMovie.release_date).getFullYear() : '—'}</span>
+                <div className="flex items-center gap-3 rounded-xl border bg-card/50 p-4">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Release Year</div>
+                    <div className="font-semibold">{tmdbMovie?.release_date ? new Date(tmdbMovie.release_date).getFullYear() : '—'}</div>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Genres:</span>
-                  <div className="flex gap-1">
+                <div className="rounded-xl border bg-card/50 p-4 col-span-2">
+                  <div className="text-xs text-muted-foreground mb-2">Genres</div>
+                  <div className="flex flex-wrap gap-2">
                     {(tmdbMovie?.genres || []).map((g) => (
-                      <Badge key={typeof g === 'string' ? g : g.id} variant="outline" className="text-xs">
+                      <Badge key={typeof g === 'string' ? g : g.id} variant="secondary" className="bg-secondary/70">
                         {typeof g === 'string' ? g : g.name}
                       </Badge>
                     ))}
@@ -453,17 +485,44 @@ const MovieDetail = () => {
               </div>
             </Card>
 
-            <Card className="p-6 space-y-4">
-              <h3 className="text-xl font-semibold">Cast & Crew</h3>
-              <div className="space-y-3">
-                {creditsCast.slice(0, 10).map((actor, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-primary" />
-                    </div>
-                    <span>{actor.name}</span>
+            {/* Financials - glossy cards with ROI */}
+            <Card className="p-6 bg-gradient-to-br from-background to-primary/5 border border-primary/10 shadow-sm">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-xl font-semibold">Financials</h3>
+                <TrendingUp className="w-5 h-5 text-primary" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="rounded-xl border bg-card/50 p-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <DollarSign className="w-3.5 h-3.5" /> Budget
                   </div>
-                ))}
+                  <div className="text-2xl font-bold mt-1">{formatCurrency(tmdbMovie?.budget)}</div>
+                </div>
+                <div className="rounded-xl border bg-card/50 p-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <DollarSign className="w-3.5 h-3.5" /> Box Office
+                  </div>
+                  <div className="text-2xl font-bold mt-1">{formatCurrency(tmdbMovie?.revenue)}</div>
+                    </div>
+                <div className="rounded-xl border bg-card/50 p-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <TrendingUp className="w-3.5 h-3.5" /> Profit
+                  </div>
+                  {(() => {
+                    const profit = (tmdbMovie?.revenue ?? 0) - (tmdbMovie?.budget ?? 0);
+                    const roi = tmdbMovie?.budget ? (profit / tmdbMovie.budget) * 100 : null;
+                    return (
+                      <div className="mt-1">
+                        <div className={`text-2xl font-bold ${profit < 0 ? 'text-destructive' : 'text-foreground'}`}>{formatCurrency(profit)}</div>
+                        {roi != null && (
+                          <div className={`text-xs mt-1 ${profit < 0 ? 'text-destructive' : 'text-primary'}`}>
+                            ROI {roi.toFixed(1)}%
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
             </Card>
           </div>

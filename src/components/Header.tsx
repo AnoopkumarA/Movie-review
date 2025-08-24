@@ -92,11 +92,11 @@ export const Header = () => {
 
           {/* Navigation */}
           <nav className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" onClick={() => navigate('/trending')}>
               <TrendingUp className="w-4 h-4 mr-2" />
               Trending
             </Button>
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" onClick={() => navigate('/top-rated')}>
               <Star className="w-4 h-4 mr-2" />
               Top Rated
             </Button>

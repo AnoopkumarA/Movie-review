@@ -9,6 +9,8 @@ import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Trending from "./pages/Trending";
+import TopRated from "./pages/TopRated";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,8 @@ const App = () => (
             <Route path="/movie/:id" element={<MovieDetail />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/trending" element={<Trending />} />
+            <Route path="/top-rated" element={<TopRated />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -5,6 +5,7 @@ export interface TmdbMovie {
   title: string;
   overview: string;
   vote_average: number;
+  vote_count?: number;
   release_date: string;
   runtime?: number;
   genres?: { id: number; name: string }[];

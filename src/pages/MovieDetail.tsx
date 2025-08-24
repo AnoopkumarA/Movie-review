@@ -57,6 +57,23 @@ const MovieDetail = () => {
     return null;
   };
 
+  const computeOverallRating = (details: TmdbMovie | null, reviews: UserReview[]) => {
+    const tmdbAvg5 = details ? (details.vote_average || 0) / 2 : 0;
+    const tmdbVotes = details?.vote_count ?? 0;
+    const tmdbWeight = Math.min(tmdbVotes, 1000); // cap to keep user ratings impactful
+
+    if (!reviews || reviews.length === 0) {
+      setOverallRating(tmdbAvg5);
+      return;
+    }
+
+    const userAvg5 = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+    const combined =
+      (tmdbAvg5 * tmdbWeight + userAvg5 * reviews.length) /
+      (tmdbWeight + reviews.length);
+    setOverallRating(combined);
+  };
+
   const fetchTmdbData = async () => {
     if (!id) return;
     try {
@@ -70,7 +87,7 @@ const MovieDetail = () => {
       setCreditsCast(creditsRes.cast || []);
       setCreditsCrew(creditsRes.crew || []);
       setTmdbReviews(reviewsRes.results || []);
-      setOverallRating(details.vote_average / 2);
+      computeOverallRating(details, userReviews);
     } catch (e) {
       console.error('Error fetching TMDB data:', e);
     } finally {
@@ -108,14 +125,7 @@ const MovieDetail = () => {
       );
 
       setUserReviews(reviewsWithProfiles as UserReview[]);
-      
-      // Calculate overall rating from user reviews
-      if (reviews && reviews.length > 0) {
-        const avgRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-        setOverallRating(avgRating);
-      } else {
-        setOverallRating((tmdbMovie?.vote_average || 0) / 2);
-      }
+      computeOverallRating(tmdbMovie, (reviews || []) as UserReview[]);
 
       // Check if current user has already reviewed this movie
       if (user) {

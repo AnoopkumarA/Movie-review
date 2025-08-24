@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StarRating } from "./StarRating";
-import { Play, Bookmark, Share } from "lucide-react";
+import { Play, Bookmark, Share, Check } from "lucide-react";
+import { useWatchlist } from "@/hooks/useWatchlist";
 import heroBackground from "@/assets/hero-background.jpg";
 
 interface MovieHeroProps {
@@ -14,6 +15,10 @@ interface MovieHeroProps {
   genre: string[];
   director: string;
   cast: string[];
+  backdropUrl?: string | null;
+  onWatchTrailer?: () => void;
+  movieId?: string;
+  posterPath?: string | null;
 }
 
 export const MovieHero = ({
@@ -26,13 +31,28 @@ export const MovieHero = ({
   genre,
   director,
   cast,
+  backdropUrl,
+  onWatchTrailer,
+  movieId,
+  posterPath,
 }: MovieHeroProps) => {
+  const { add, exists, remove } = useWatchlist();
+  const effectiveMovieId = movieId || (typeof window !== 'undefined' ? window.location.pathname.split('/').pop() || '' : '');
+  const inWatchlist = exists(effectiveMovieId);
+  const toggleWatchlist = () => {
+    if (!effectiveMovieId) return;
+    if (inWatchlist) {
+      remove(effectiveMovieId);
+    } else {
+      add(effectiveMovieId, title, posterPath ?? null);
+    }
+  };
   return (
     <section className="relative min-h-[80vh] flex items-center">
       {/* Background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroBackground})` }}
+        style={{ backgroundImage: `url(${backdropUrl || heroBackground})` }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40" />
       
@@ -92,14 +112,16 @@ export const MovieHero = ({
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-4 pt-4">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-rating">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-rating" onClick={onWatchTrailer}>
               <Play className="w-5 h-5 mr-2" />
               Watch Trailer
             </Button>
-            <Button variant="outline" size="lg">
-              <Bookmark className="w-5 h-5 mr-2" />
-              Add to Watchlist
+            {effectiveMovieId && (
+            <Button variant="outline" size="lg" onClick={toggleWatchlist}>
+              {inWatchlist ? <Check className="w-5 h-5 mr-2" /> : <Bookmark className="w-5 h-5 mr-2" />}
+              {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
             </Button>
+            )}
             <Button variant="ghost" size="lg">
               <Share className="w-5 h-5 mr-2" />
               Share

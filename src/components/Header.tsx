@@ -3,13 +3,47 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { tmdb } from "@/integrations/tmdb/client";
 
 export const Header = () => {
   const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [results, setResults] = useState<{ id: number; title: string }[]>([]);
+  const debounceRef = useRef<number | null>(null);
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const runSearch = async (q: string) => {
+    if (!q.trim()) {
+      setResults([]);
+      return;
+    }
+    try {
+      setIsSearching(true);
+      const { results } = await tmdb.searchMovies(q, 1);
+      setResults(results.slice(0, 8).map(r => ({ id: r.id, title: r.title })));
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  useEffect(() => {
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(() => runSearch(query), 300);
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [query]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (results[0]) navigate(`/movie/${results[0].id}`);
   };
 
   return (
@@ -31,13 +65,29 @@ export const Header = () => {
 
           {/* Search Bar */}
           <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
-            <div className="relative w-full">
+            <form onSubmit={handleSubmit} className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search movies, actors, directors..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search movies..."
                 className="pl-10 bg-secondary/50 border-border focus:bg-secondary"
               />
-            </div>
+              {query && results.length > 0 && (
+                <div className="absolute z-50 mt-2 w-full bg-background border rounded-md shadow-lg">
+                  {results.map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      className="w-full text-left px-3 py-2 hover:bg-muted"
+                      onClick={() => navigate(`/movie/${r.id}`)}
+                    >
+                      {r.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </form>
           </div>
 
           {/* Navigation */}
@@ -61,7 +111,7 @@ export const Header = () => {
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
                   <User className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">{user.email?.split('@')[0]}</span>
+                  <Link to="/profile" className="text-sm font-medium hover:underline">{user.email?.split('@')[0]}</Link>
                 </div>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   <LogOut className="w-4 h-4 mr-2" />

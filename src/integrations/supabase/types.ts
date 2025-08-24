@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      watchlist: {
+        Row: {
+          id: string
+          user_id: string
+          movie_id: string
+          title: string
+          poster_path: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          movie_id: string
+          title: string
+          poster_path?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          movie_id?: string
+          title?: string
+          poster_path?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_reviews: {
         Row: {
           content: string | null

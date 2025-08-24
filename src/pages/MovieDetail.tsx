@@ -5,6 +5,7 @@ import { MovieHero } from "@/components/MovieHero";
 import { StarRating } from "@/components/StarRating";
 import { UserReviewForm } from "@/components/UserReviewForm";
 import { CastAndCrew } from "@/components/CastAndCrew";
+import { MovieImageGallery } from "@/components/MovieImageGallery";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ThumbsUp, Calendar, User, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TrailerModal } from "@/components/TrailerModal";
+import { youtube } from "@/integrations/youtube/client";
 
 interface UserReview {
   id: string;
@@ -34,6 +37,10 @@ const MovieDetail = () => {
   const [creditsCast, setCreditsCast] = useState<TmdbCredit[]>([]);
   const [creditsCrew, setCreditsCrew] = useState<TmdbCredit[]>([]);
   const [tmdbReviews, setTmdbReviews] = useState<TmdbReview[]>([]);
+  const [backdropUrls, setBackdropUrls] = useState<string[]>([]);
+  const [posterUrls, setPosterUrls] = useState<string[]>([]);
+  const [trailerOpen, setTrailerOpen] = useState(false);
+  const [trailerVideoId, setTrailerVideoId] = useState<string | null>(null);
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
   const [userExistingReview, setUserExistingReview] = useState<{ rating: number; content: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,20 +85,39 @@ const MovieDetail = () => {
     if (!id) return;
     try {
       setLoading(true);
-      const [details, creditsRes, reviewsRes] = await Promise.all([
+      const [details, creditsRes, reviewsRes, imagesRes] = await Promise.all([
         tmdb.getMovieDetails(id),
         tmdb.getMovieCredits(id),
         tmdb.getMovieReviews(id),
+        tmdb.getMovieImages(id),
       ]);
       setTmdbMovie(details);
       setCreditsCast(creditsRes.cast || []);
       setCreditsCrew(creditsRes.crew || []);
       setTmdbReviews(reviewsRes.results || []);
+      setBackdropUrls((imagesRes.backdrops || []).slice(0, 12).map(img => tmdbImageUrl(img.file_path, 'w500')!).filter(Boolean));
+      setPosterUrls((imagesRes.posters || []).slice(0, 12).map(img => tmdbImageUrl(img.file_path, 'w500')!).filter(Boolean));
       computeOverallRating(details, userReviews);
     } catch (e) {
       console.error('Error fetching TMDB data:', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const findAndOpenTrailer = async () => {
+    try {
+      if (!tmdbMovie) return;
+      const year = tmdbMovie.release_date ? new Date(tmdbMovie.release_date).getFullYear() : '';
+      const query = `${tmdbMovie.title} ${year} official trailer`;
+      const { items } = await youtube.searchVideos(query, 1);
+      const vid = items?.[0]?.id?.videoId || null;
+      setTrailerVideoId(vid);
+      setTrailerOpen(true);
+    } catch (err) {
+      console.error('Error finding trailer:', err);
+      setTrailerVideoId(null);
+      setTrailerOpen(true);
     }
   };
 
@@ -108,24 +134,31 @@ const MovieDetail = () => {
 
       if (error) throw error;
 
-      // Fetch profiles separately for now
-      const reviewsWithProfiles = await Promise.all(
+      // Fetch profiles separately and map to typed structure
+      const reviewsWithProfiles: UserReview[] = await Promise.all(
         (reviews || []).map(async (review) => {
           const { data: profile } = await supabase
             .from('profiles')
             .select('username')
             .eq('user_id', review.user_id)
             .single();
-          
-          return {
-            ...review,
-            profiles: profile
+
+          const mapped: UserReview = {
+            id: review.id,
+            user_id: review.user_id,
+            movie_id: review.movie_id,
+            rating: review.rating,
+            content: review.content,
+            created_at: review.created_at,
+            profiles: profile ? { username: profile.username ?? null } : null,
           };
+
+          return mapped;
         })
       );
 
-      setUserReviews(reviewsWithProfiles as UserReview[]);
-      computeOverallRating(tmdbMovie, (reviews || []) as UserReview[]);
+      setUserReviews(reviewsWithProfiles);
+      computeOverallRating(tmdbMovie, reviewsWithProfiles);
 
       // Check if current user has already reviewed this movie
       if (user) {
@@ -169,6 +202,7 @@ const MovieDetail = () => {
       
       {tmdbMovie && (
         <MovieHero
+          movieId={id!}
           title={tmdbMovie.title}
           description={tmdbMovie.overview}
           rating={overallRating}
@@ -178,6 +212,9 @@ const MovieDetail = () => {
           genre={(tmdbMovie.genres || []).map(g => g.name)}
           director={(creditsCrew.find(c => (c.job || '').toLowerCase() === 'director')?.name) || ''}
           cast={(creditsCast.slice(0, 5)).map(c => c.name)}
+          backdropUrl={tmdbImageUrl(tmdbMovie.backdrop_path, 'w500') || tmdbImageUrl(tmdbMovie.poster_path, 'w500') || undefined}
+          posterPath={tmdbMovie.poster_path}
+          onWatchTrailer={findAndOpenTrailer}
         />
       )}
 
@@ -212,6 +249,18 @@ const MovieDetail = () => {
                 <CastAndCrew castAndCrew={[...castMembers, ...crewMembers]} />
               );
             })()}
+          </section>
+        )}
+
+        {/* Image Galleries */}
+        {(backdropUrls.length > 0 || posterUrls.length > 0) && (
+          <section className="mb-12 space-y-8">
+            {backdropUrls.length > 0 && (
+              <MovieImageGallery imageUrls={backdropUrls} title="Backdrops" />
+            )}
+            {posterUrls.length > 0 && (
+              <MovieImageGallery imageUrls={posterUrls} title="Posters" />
+            )}
           </section>
         )}
 
@@ -420,6 +469,7 @@ const MovieDetail = () => {
           </div>
         </section>
       </div>
+      <TrailerModal open={trailerOpen} onOpenChange={setTrailerOpen} videoId={trailerVideoId || undefined} title={tmdbMovie?.title} />
     </div>
   );
 };

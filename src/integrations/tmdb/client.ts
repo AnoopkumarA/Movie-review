@@ -10,6 +10,7 @@ export interface TmdbMovie {
   runtime?: number;
   genres?: { id: number; name: string }[];
   poster_path: string | null;
+  backdrop_path: string | null;
 }
 
 export interface TmdbReview {
@@ -27,6 +28,14 @@ export interface TmdbCredit {
   job?: string;
   profile_path: string | null;
   department?: string;
+}
+
+export interface TmdbImage {
+  file_path: string;
+  width: number;
+  height: number;
+  iso_639_1: string | null;
+  aspect_ratio: number;
 }
 
 const getApiKey = (): string => {
@@ -71,6 +80,18 @@ export const tmdb = {
     const res = await fetch(buildUrl(`/movie/${movieId}/reviews`, { page }));
     if (!res.ok) throw new Error("Failed to fetch movie reviews");
     return res.json() as Promise<{ results: TmdbReview[] }>;
+  },
+
+  async getMovieImages(movieId: string | number) {
+    const res = await fetch(buildUrl(`/movie/${movieId}/images`));
+    if (!res.ok) throw new Error("Failed to fetch movie images");
+    return res.json() as Promise<{ backdrops: TmdbImage[]; posters: TmdbImage[] }>;
+  },
+
+  async searchMovies(query: string, page = 1) {
+    const res = await fetch(buildUrl(`/search/movie`, { query, page, include_adult: 0 }));
+    if (!res.ok) throw new Error("Failed to search movies");
+    return res.json() as Promise<{ results: TmdbMovie[] }>;
   },
 };
 

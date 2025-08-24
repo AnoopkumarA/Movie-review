@@ -61,6 +61,7 @@ const Index = () => {
           genre={(featured.genres || []).map(g => g.name)}
           director={""}
           cast={[]}
+          backdropUrl={tmdbImageUrl(featured.backdrop_path, 'w500') || tmdbImageUrl(featured.poster_path, 'w500') || undefined}
         />
       )}
 

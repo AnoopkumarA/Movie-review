@@ -60,6 +60,18 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Environment variables
+
+Create a `.env` or `.env.local` file in the project root with the following variable:
+
+```bash
+VITE_TMDB_API_KEY=your_tmdb_api_key_here
+```
+
+Notes:
+- Variables must start with `VITE_` to be exposed to the client in Vite.
+- After adding or changing env variables, restart the dev server.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/c298aee0-0a82-483f-b59d-9b61f065e7f6) and click on Share -> Publish.

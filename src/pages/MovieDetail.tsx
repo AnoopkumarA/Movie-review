@@ -8,7 +8,8 @@ import { CastAndCrew } from "@/components/CastAndCrew";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { movies } from "@/data/movies";
+import { CastMember } from "@/data/movies";
+import { tmdb, tmdbImageUrl, TmdbMovie, TmdbCredit, TmdbReview } from "@/integrations/tmdb/client";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ThumbsUp, Calendar, User, Star } from "lucide-react";
@@ -29,11 +30,53 @@ interface UserReview {
 const MovieDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const movie = movies.find(m => m.id === id);
+  const [tmdbMovie, setTmdbMovie] = useState<TmdbMovie | null>(null);
+  const [creditsCast, setCreditsCast] = useState<TmdbCredit[]>([]);
+  const [creditsCrew, setCreditsCrew] = useState<TmdbCredit[]>([]);
+  const [tmdbReviews, setTmdbReviews] = useState<TmdbReview[]>([]);
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
   const [userExistingReview, setUserExistingReview] = useState<{ rating: number; content: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [overallRating, setOverallRating] = useState(0);
+
+  const formatRuntime = (minutes?: number) => {
+    if (!minutes) return "";
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${h}h ${m}m`;
+  };
+
+  const mapCrewRole = (job?: string, department?: string): CastMember['role'] | null => {
+    const j = (job || '').toLowerCase();
+    const d = (department || '').toLowerCase();
+    if (j.includes('director')) return 'director';
+    if (j.includes('producer')) return 'producer';
+    if (j.includes('screenplay') || j.includes('writer') || d.includes('writing')) return 'writer';
+    if (j.includes('director of photography') || j.includes('cinematography')) return 'cinematographer';
+    if (d.includes('sound') || j.includes('music') || j.includes('composer')) return 'composer';
+    return null;
+  };
+
+  const fetchTmdbData = async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      const [details, creditsRes, reviewsRes] = await Promise.all([
+        tmdb.getMovieDetails(id),
+        tmdb.getMovieCredits(id),
+        tmdb.getMovieReviews(id),
+      ]);
+      setTmdbMovie(details);
+      setCreditsCast(creditsRes.cast || []);
+      setCreditsCrew(creditsRes.crew || []);
+      setTmdbReviews(reviewsRes.results || []);
+      setOverallRating(details.vote_average / 2);
+    } catch (e) {
+      console.error('Error fetching TMDB data:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchReviews = async () => {
     if (!id) return;
@@ -71,7 +114,7 @@ const MovieDetail = () => {
         const avgRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
         setOverallRating(avgRating);
       } else {
-        setOverallRating(movie?.rating || 0);
+        setOverallRating((tmdbMovie?.vote_average || 0) / 2);
       }
 
       // Check if current user has already reviewed this movie
@@ -92,10 +135,14 @@ const MovieDetail = () => {
   };
 
   useEffect(() => {
-    fetchReviews();
-  }, [id, user]);
+    fetchTmdbData();
+  }, [id]);
 
-  if (!movie) {
+  useEffect(() => {
+    fetchReviews();
+  }, [id, user, tmdbMovie]);
+
+  if (!tmdbMovie && !loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -110,23 +157,53 @@ const MovieDetail = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <MovieHero
-        title={movie.title}
-        description={movie.description}
-        rating={overallRating}
-        imdbRating={movie.imdbRating}
-        year={movie.year}
-        runtime={movie.runtime}
-        genre={movie.genre}
-        director={movie.director}
-        cast={movie.cast}
-      />
+      {tmdbMovie && (
+        <MovieHero
+          title={tmdbMovie.title}
+          description={tmdbMovie.overview}
+          rating={overallRating}
+          imdbRating={tmdbMovie.vote_average}
+          year={tmdbMovie.release_date ? new Date(tmdbMovie.release_date).getFullYear() : 0}
+          runtime={formatRuntime(tmdbMovie.runtime)}
+          genre={(tmdbMovie.genres || []).map(g => g.name)}
+          director={(creditsCrew.find(c => (c.job || '').toLowerCase() === 'director')?.name) || ''}
+          cast={(creditsCast.slice(0, 5)).map(c => c.name)}
+        />
+      )}
 
       <div className="container mx-auto px-4 py-12">
         {/* Cast and Crew Section */}
-        <section className="mb-12">
-          <CastAndCrew castAndCrew={movie.castAndCrew} />
-        </section>
+        {tmdbMovie && (
+          <section className="mb-12">
+            {(() => {
+              const castMembers: CastMember[] = creditsCast.slice(0, 30).map((c) => ({
+                id: String(c.id),
+                name: c.name,
+                character: c.character || '',
+                image: tmdbImageUrl(c.profile_path, 'w185') || undefined,
+                role: 'actor',
+              }));
+
+              const crewMembers: CastMember[] = creditsCrew
+                .map((c) => {
+                  const role = mapCrewRole(c.job, c.department);
+                  if (!role) return null;
+                  return {
+                    id: String(c.id),
+                    name: c.name,
+                    character: c.job || c.department || '',
+                    image: tmdbImageUrl(c.profile_path, 'w185') || undefined,
+                    role,
+                  } as CastMember;
+                })
+                .filter((m): m is CastMember => Boolean(m));
+
+              return (
+                <CastAndCrew castAndCrew={[...castMembers, ...crewMembers]} />
+              );
+            })()}
+          </section>
+        )}
 
         {/* User Review Form */}
         {user ? (
@@ -156,7 +233,7 @@ const MovieDetail = () => {
           </section>
         )}
 
-        {/* Reviews Section */}
+        {/* Reviews Section (User Reviews via Supabase) */}
         <section className="space-y-8">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold">
@@ -239,13 +316,13 @@ const MovieDetail = () => {
             </Card>
           )}
 
-          {/* Original Reviews from mock data */}
-          {movie.reviews.length > 0 && (
+          {/* TMDB Reviews */}
+          {tmdbReviews.length > 0 && (
             <div className="space-y-6">
               <div className="border-t pt-8">
-                <h3 className="text-xl font-semibold mb-6">Editorial Reviews</h3>
+                <h3 className="text-xl font-semibold mb-6">TMDB Reviews</h3>
                 <div className="grid gap-6">
-                  {movie.reviews.map((review) => (
+                  {tmdbReviews.map((review) => (
                     <Card key={review.id} className="p-6 space-y-4 border-dashed">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -256,21 +333,16 @@ const MovieDetail = () => {
                             <h4 className="font-semibold">{review.author}</h4>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <Calendar className="w-4 h-4" />
-                              {new Date(review.date).toLocaleDateString()}
+                              {new Date(review.created_at).toLocaleDateString()}
                             </div>
                           </div>
                         </div>
-                        <StarRating rating={review.rating} size="sm" showNumber={false} />
+                        {typeof review.author_details?.rating === 'number' && (
+                          <StarRating rating={review.author_details.rating / 2} size="sm" showNumber={false} />
+                        )}
                       </div>
 
                       <p className="text-muted-foreground leading-relaxed">{review.content}</p>
-
-                      <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="sm">
-                          <ThumbsUp className="w-4 h-4 mr-2" />
-                          Helpful ({review.helpful})
-                        </Button>
-                      </div>
                     </Card>
                   ))}
                 </div>
@@ -299,22 +371,22 @@ const MovieDetail = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Director:</span>
-                  <span>{movie.director}</span>
+                  <span>{(creditsCrew.find(c => (c.job || '').toLowerCase() === 'director')?.name) || '—'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Runtime:</span>
-                  <span>{movie.runtime}</span>
+                  <span>{formatRuntime(tmdbMovie?.runtime)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Release Year:</span>
-                  <span>{movie.year}</span>
+                  <span>{tmdbMovie?.release_date ? new Date(tmdbMovie.release_date).getFullYear() : '—'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Genres:</span>
                   <div className="flex gap-1">
-                    {movie.genre.map((g) => (
-                      <Badge key={g} variant="outline" className="text-xs">
-                        {g}
+                    {(tmdbMovie?.genres || []).map((g) => (
+                      <Badge key={typeof g === 'string' ? g : g.id} variant="outline" className="text-xs">
+                        {typeof g === 'string' ? g : g.name}
                       </Badge>
                     ))}
                   </div>
@@ -325,12 +397,12 @@ const MovieDetail = () => {
             <Card className="p-6 space-y-4">
               <h3 className="text-xl font-semibold">Cast & Crew</h3>
               <div className="space-y-3">
-                {movie.cast.map((actor, index) => (
+                {creditsCast.slice(0, 10).map((actor, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-primary" />
                     </div>
-                    <span>{actor}</span>
+                    <span>{actor.name}</span>
                   </div>
                 ))}
               </div>

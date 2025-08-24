@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { MovieCard } from "@/components/MovieCard";
@@ -6,12 +6,34 @@ import { MovieHero } from "@/components/MovieHero";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { movies, featuredMovie } from "@/data/movies";
+// import { movies, featuredMovie } from "@/data/movies";
 import { TrendingUp, Star, Clock } from "lucide-react";
+import { tmdb, tmdbImageUrl, TmdbMovie } from "@/integrations/tmdb/client";
 
 const Index = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [popular, setPopular] = useState<TmdbMovie[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const run = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const { results } = await tmdb.getPopularMovies(1);
+        setPopular(results);
+      } catch (e) {
+        setError((e as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    run();
+  }, []);
+
+  const featured = useMemo(() => popular[0], [popular]);
 
   const categories = [
     { id: "all", label: "All Movies", icon: Star },
@@ -28,17 +50,19 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <MovieHero
-        title={featuredMovie.title}
-        description={featuredMovie.description}
-        rating={featuredMovie.rating}
-        imdbRating={featuredMovie.imdbRating}
-        year={featuredMovie.year}
-        runtime={featuredMovie.runtime}
-        genre={featuredMovie.genre}
-        director={featuredMovie.director}
-        cast={featuredMovie.cast}
-      />
+      {featured && (
+        <MovieHero
+          title={featured.title}
+          description={featured.overview}
+          rating={Math.round((featured.vote_average / 2) * 10) / 10}
+          imdbRating={featured.vote_average}
+          year={featured.release_date ? new Date(featured.release_date).getFullYear() : 0}
+          runtime={`${featured.runtime || 0}m`}
+          genre={(featured.genres || []).map(g => g.name)}
+          director={""}
+          cast={[]}
+        />
+      )}
 
       <div className="container mx-auto px-4 py-12">
         {/* Categories */}
@@ -66,26 +90,37 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold">Featured Movies</h2>
             <Badge variant="secondary">
-              {movies.length} Movies Available
+              {popular.length} Movies Available
             </Badge>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {movies.map((movie) => (
-              <MovieCard
-                key={movie.id}
-                id={movie.id}
-                title={movie.title}
-                poster={movie.poster}
-                rating={movie.rating}
-                imdbRating={movie.imdbRating}
-                year={movie.year}
-                genre={movie.genre}
-                cast={movie.cast}
-                onClick={() => handleMovieClick(movie.id)}
-              />
-            ))}
-          </div>
+          {error && (
+            <Card className="p-6 text-center text-destructive">{error}</Card>
+          )}
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, idx) => (
+                <Card key={idx} className="aspect-[3/4] animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {popular.map((movie) => (
+                <MovieCard
+                  key={movie.id}
+                  id={String(movie.id)}
+                  title={movie.title}
+                  poster={tmdbImageUrl(movie.poster_path, 'w500') || ''}
+                  rating={Math.round((movie.vote_average / 2) * 10) / 10}
+                  imdbRating={movie.vote_average}
+                  year={movie.release_date ? new Date(movie.release_date).getFullYear() : 0}
+                  genre={(movie.genres || []).map(g => g.name)}
+                  cast={[]}
+                  onClick={() => handleMovieClick(String(movie.id))}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Ad Space */}

@@ -5,6 +5,7 @@ import { MovieHero } from "@/components/MovieHero";
 import { StarRating } from "@/components/StarRating";
 import { UserReviewForm } from "@/components/UserReviewForm";
 import { CastAndCrew } from "@/components/CastAndCrew";
+import { Footer } from "@/components/Footer";
 import { MovieImageGallery } from "@/components/MovieImageGallery";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ import { CastMember } from "@/data/movies";
 import { tmdb, tmdbImageUrl, TmdbMovie, TmdbCredit, TmdbReview } from "@/integrations/tmdb/client";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ThumbsUp, Calendar, User, Star, Clock, Clapperboard, DollarSign, TrendingUp } from "lucide-react";
+import { ThumbsUp, Calendar, User, Star, Clock, Clapperboard, DollarSign, TrendingUp, MessageSquare, Share } from "lucide-react";
 import { Link } from "react-router-dom";
 import { TrailerModal } from "@/components/TrailerModal";
 import { youtube } from "@/integrations/youtube/client";
@@ -108,8 +109,8 @@ const MovieDetail = () => {
       setCreditsCast(creditsRes.cast || []);
       setCreditsCrew(creditsRes.crew || []);
       setTmdbReviews(reviewsRes.results || []);
-      setBackdropUrls((imagesRes.backdrops || []).slice(0, 12).map(img => tmdbImageUrl(img.file_path, 'w500')!).filter(Boolean));
-      setPosterUrls((imagesRes.posters || []).slice(0, 12).map(img => tmdbImageUrl(img.file_path, 'w500')!).filter(Boolean));
+      setBackdropUrls((imagesRes.backdrops || []).slice(0, 12).map(img => tmdbImageUrl(img.file_path, 'original')!).filter(Boolean));
+      setPosterUrls((imagesRes.posters || []).slice(0, 12).map(img => tmdbImageUrl(img.file_path, 'original')!).filter(Boolean));
       computeOverallRating(details, userReviews);
     } catch (e) {
       console.error('Error fetching TMDB data:', e);
@@ -225,7 +226,7 @@ const MovieDetail = () => {
           genre={(tmdbMovie.genres || []).map(g => g.name)}
           director={(creditsCrew.find(c => (c.job || '').toLowerCase() === 'director')?.name) || ''}
           cast={(creditsCast.slice(0, 5)).map(c => c.name)}
-          backdropUrl={tmdbImageUrl(tmdbMovie.backdrop_path, 'w500') || tmdbImageUrl(tmdbMovie.poster_path, 'w500') || undefined}
+          backdropUrl={tmdbImageUrl(tmdbMovie.backdrop_path, 'original') || tmdbImageUrl(tmdbMovie.poster_path, 'original') || undefined}
           posterPath={tmdbMovie.poster_path}
           onWatchTrailer={findAndOpenTrailer}
         />
@@ -240,7 +241,7 @@ const MovieDetail = () => {
                 id: String(c.id),
                 name: c.name,
                 character: c.character || '',
-                image: tmdbImageUrl(c.profile_path, 'w185') || undefined,
+                image: tmdbImageUrl(c.profile_path, 'original') || undefined,
                 role: 'actor',
               }));
 
@@ -252,7 +253,7 @@ const MovieDetail = () => {
                     id: String(c.id),
                     name: c.name,
                     character: c.job || c.department || '',
-                    image: tmdbImageUrl(c.profile_path, 'w185') || undefined,
+                    image: tmdbImageUrl(c.profile_path, 'original') || undefined,
                     role,
                   } as CastMember;
                 })
@@ -305,28 +306,33 @@ const MovieDetail = () => {
           </section>
         )}
 
-        {/* Reviews Section (User Reviews via Supabase) */}
+                {/* Combined Reviews Section */}
         <section className="space-y-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold">
-              User Reviews
-              {userReviews.length > 0 && (
-                <span className="text-lg font-normal text-muted-foreground ml-2">
-                  ({userReviews.length} {userReviews.length === 1 ? 'review' : 'reviews'})
-                </span>
-              )}
-            </h2>
-            <div className="flex items-center gap-2">
-              <Star className="w-5 h-5 text-rating-gold" fill="currentColor" />
-              <span className="font-semibold">{overallRating.toFixed(1)}</span>
-              <span className="text-muted-foreground">overall rating</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold">
+                TMDB Reviews
+                {(userReviews.length + tmdbReviews.length) > 0 && (
+                  <span className="text-lg font-normal text-muted-foreground ml-2">
+                    ({userReviews.length + tmdbReviews.length} {(userReviews.length + tmdbReviews.length) === 1 ? 'review' : 'reviews'})
+                  </span>
+                )}
+              </h2>
+              <div className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-rating-gold" fill="currentColor" />
+                <span className="font-semibold">{overallRating.toFixed(1)}</span>
+                <span className="text-muted-foreground">overall rating</span>
+              </div>
             </div>
+            <p className="text-muted-foreground text-sm">
+              Professional critic reviews from TMDB and user reviews from our community
+            </p>
           </div>
 
           {loading ? (
             <div className="grid gap-6">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Card key={i} className="p-6">
+                <Card key={i} className="p-6 rounded-xl border-2 border-border/80 bg-card/60 backdrop-blur-sm shadow-md">
                   <div className="animate-pulse space-y-4">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-muted rounded-full"></div>
@@ -343,38 +349,86 @@ const MovieDetail = () => {
                 </Card>
               ))}
             </div>
-          ) : userReviews.length > 0 ? (
+          ) : (userReviews.length > 0 || tmdbReviews.length > 0) ? (
             <div className="grid gap-6">
+              {/* User Reviews */}
               {userReviews.map((review) => (
-                <Card key={review.id} className="p-6 space-y-4">
-                  <div className="flex items-center justify-between">
+                <Card key={`user-${review.id}`} className="p-6 rounded-xl border-2 border-primary/20 bg-gradient-to-br from-background to-primary/5 shadow-md hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-primary" />
+                      <div className="p-[2px] rounded-full bg-gradient-to-br from-primary/60 via-primary/20 to-transparent">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="w-5 h-5 text-primary" />
+                        </div>
                       </div>
                       <div>
-                        <h4 className="font-semibold">
-                          {review.profiles?.username || 'Anonymous User'}
-                        </h4>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold">
+                            {review.profiles?.username || 'Anonymous User'}
+                          </h4>
+                          <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+                            User Review
+                          </Badge>
+                        </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="w-4 h-4" />
                           {new Date(review.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
-                    <StarRating rating={review.rating} size="sm" showNumber={false} />
+                    <div className="shrink-0">
+                      <div className="px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold flex items-center gap-1">
+                        <Star className="w-4 h-4" />
+                        <span>{review.rating.toFixed(1)}</span>
+                      </div>
+                    </div>
                   </div>
 
                   {review.content && (
-                    <p className="text-muted-foreground leading-relaxed">{review.content}</p>
+                    <p className="text-muted-foreground leading-relaxed mt-4">
+                      {review.content}
+                    </p>
                   )}
 
-                  <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="sm">
+                  <div className="flex items-center gap-4 mt-3">
+                    <Button variant="ghost" size="sm" className="hover:bg-primary/10">
                       <ThumbsUp className="w-4 h-4 mr-2" />
                       Helpful
                     </Button>
                   </div>
+                </Card>
+              ))}
+
+              {/* TMDB Reviews */}
+              {tmdbReviews.map((review) => (
+                <Card key={`tmdb-${review.id}`} className="p-6 rounded-xl border-2 border-border/80 bg-card/60 backdrop-blur-sm shadow-md hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-secondary/40 flex items-center justify-center ring-1 ring-border">
+                        <User className="w-5 h-5 text-secondary-foreground" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold">{review.author}</h4>
+                          <Badge variant="outline" className="text-xs bg-secondary/20 text-secondary-foreground border-secondary/40">
+                            TMDB Review
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="w-4 h-4" />
+                          {new Date(review.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                    {typeof review.author_details?.rating === 'number' && (
+                      <div className="px-3 py-1 rounded-full bg-primary/10 text-primary font-semibold flex items-center gap-1">
+                        <Star className="w-4 h-4" />
+                        <span>{(review.author_details.rating / 2).toFixed(1)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-muted-foreground leading-relaxed mt-4">{review.content}</p>
                 </Card>
               ))}
             </div>
@@ -382,44 +436,22 @@ const MovieDetail = () => {
             <Card className="p-8 text-center">
               <div className="text-muted-foreground">
                 <Star className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium mb-2">No user reviews yet</p>
+                <p className="text-lg font-medium mb-2">No reviews yet</p>
                 <p className="text-sm">Be the first to share your thoughts about this movie!</p>
               </div>
             </Card>
           )}
 
-          {/* TMDB Reviews */}
-          {tmdbReviews.length > 0 && (
-            <div className="space-y-6">
-              <div className="border-t pt-8">
-                <h3 className="text-xl font-semibold mb-6">TMDB Reviews</h3>
-                <div className="grid gap-6">
-                  {tmdbReviews.map((review) => (
-                    <Card key={review.id} className="p-6 space-y-4 border-dashed">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-secondary/50 rounded-full flex items-center justify-center">
-                            <User className="w-5 h-5 text-secondary-foreground" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold">{review.author}</h4>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Calendar className="w-4 h-4" />
-                              {new Date(review.created_at).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </div>
-                        {typeof review.author_details?.rating === 'number' && (
-                          <StarRating rating={review.author_details.rating / 2} size="sm" showNumber={false} />
-                        )}
-                      </div>
-
-                      <p className="text-muted-foreground leading-relaxed">{review.content}</p>
-                    </Card>
-                  ))}
-                </div>
+          {/* Show personalized message if user hasn't reviewed */}
+          {!loading && user && userReviews.length === 0 && (
+            <Card className="p-6 border-2 border-dashed border-muted-foreground/30 bg-muted/20">
+              <div className="text-center">
+                <MessageSquare className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  You haven't reviewed this movie yet. Share your thoughts!
+                </p>
               </div>
-            </div>
+            </Card>
           )}
         </section>
 
@@ -435,7 +467,27 @@ const MovieDetail = () => {
 
         {/* Movie Details */}
         <section className="space-y-8">
+          <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold">Movie Details</h2>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: tmdbMovie?.title || 'Movie',
+                  text: tmdbMovie?.overview || '',
+                  url: window.location.href
+                });
+              } else {
+                navigator.clipboard.writeText(window.location.href);
+                // You could add a toast notification here
+              }
+            }}
+          >
+            <Share className="w-4 h-4 mr-2" />
+            Share
+          </Button>
+        </div>
           
           <div className="grid md:grid-cols-2 gap-8">
             {/* Technical Details - modern stat cards */}
@@ -528,6 +580,10 @@ const MovieDetail = () => {
           </div>
         </section>
       </div>
+      
+      {/* Footer */}
+      <Footer />
+      
       <TrailerModal open={trailerOpen} onOpenChange={setTrailerOpen} videoId={trailerVideoId || undefined} title={tmdbMovie?.title} />
     </div>
   );

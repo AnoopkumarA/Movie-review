@@ -43,7 +43,11 @@ export const Header = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (results[0]) navigate(`/movie/${results[0].id}`);
+    if (results[0]) {
+      navigate(`/movie/${results[0].id}`);
+      setQuery('');
+      setResults([]);
+    }
   };
 
   return (
@@ -51,7 +55,7 @@ export const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="flex items-center gap-2">
               <Film className="w-8 h-8 text-primary" />
               <h1 className="text-2xl font-bold bg-gradient-rating bg-clip-text text-transparent">
@@ -61,7 +65,7 @@ export const Header = () => {
             <Badge variant="secondary" className="hidden sm:inline-flex">
               Reviews & Ratings
             </Badge>
-          </div>
+          </Link>
 
           {/* Search Bar */}
           <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
@@ -80,7 +84,11 @@ export const Header = () => {
                       key={r.id}
                       type="button"
                       className="w-full text-left px-3 py-2 hover:bg-muted"
-                      onClick={() => navigate(`/movie/${r.id}`)}
+                      onClick={() => {
+                        navigate(`/movie/${r.id}`);
+                        setQuery('');
+                        setResults([]);
+                      }}
                     >
                       {r.title}
                     </button>
@@ -109,10 +117,9 @@ export const Header = () => {
               <div className="w-8 h-8 animate-spin rounded-full border-b-2 border-primary"></div>
             ) : user ? (
               <div className="flex items-center gap-2">
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
+                <Link to="/profile" className="p-2 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors">
                   <User className="w-4 h-4 text-primary" />
-                  <Link to="/profile" className="text-sm font-medium hover:underline">{user.email?.split('@')[0]}</Link>
-                </div>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   <LogOut className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Sign Out</span>

@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { MovieCard } from "@/components/MovieCard";
 import { Card } from "@/components/ui/card";
 import { tmdb, tmdbImageUrl, TmdbMovie } from "@/integrations/tmdb/client";
+import { Footer } from "@/components/Footer";
 
 const Trending = () => {
   const [movies, setMovies] = useState<TmdbMovie[]>([]);
@@ -43,9 +44,9 @@ const Trending = () => {
                 key={movie.id}
                 id={String(movie.id)}
                 title={movie.title}
-                poster={tmdbImageUrl(movie.poster_path, 'w500') || ''}
+                poster={tmdbImageUrl(movie.poster_path, 'original') || ''}
                 rating={Math.round((movie.vote_average / 2) * 10) / 10}
-                imdbRating={movie.vote_average}
+                imdbRating={Number(movie.vote_average.toFixed(1))}
                 year={movie.release_date ? new Date(movie.release_date).getFullYear() : 0}
                 genre={(movie.genres || []).map(g => g.name)}
                 cast={[]}
@@ -55,6 +56,9 @@ const Trending = () => {
           </div>
         )}
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Film, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Footer } from '@/components/Footer';
 
 const Auth = () => {
   const { user, signIn, signUp, loading } = useAuth();
@@ -196,6 +197,9 @@ const Auth = () => {
           </form>
         </Card>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

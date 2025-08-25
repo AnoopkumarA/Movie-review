@@ -2,7 +2,7 @@ import { CastMember } from "@/data/movies";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { User, ChevronRight, ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -117,15 +117,22 @@ export const CastAndCrew = ({ castAndCrew, showCount = 12 }: CastAndCrewProps) =
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="p-[3px] rounded-full bg-gradient-to-br from-primary/70 via-primary/30 to-transparent">
-                        <Avatar className="h-24 w-24 sm:h-28 sm:w-28 ring-1 ring-border transition-transform duration-300 group-hover:scale-105">
+                        <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-full ring-1 ring-border transition-transform duration-300 group-hover:scale-105 overflow-hidden bg-muted">
                           {member.image ? (
-                            <AvatarImage src={member.image} alt={member.name} />
+                            <img 
+                              src={member.image} 
+                              alt={member.name}
+                              className="w-full h-full object-cover rounded-full"
+                              style={{
+                                objectPosition: 'center 30%'
+                              }}
+                            />
                           ) : (
-                            <AvatarFallback>
+                            <div className="w-full h-full rounded-full bg-muted flex items-center justify-center">
                               <User className="w-8 h-8 text-muted-foreground" />
-                            </AvatarFallback>
+                            </div>
                           )}
-                        </Avatar>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="text-xs">

@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { StarRating } from "./StarRating";
 import { Play, Bookmark, Share, Check } from "lucide-react";
 import { useWatchlist } from "@/hooks/useWatchlist";
-import heroBackground from "@/assets/hero-background.jpg";
+import heroBackground from "@/assets/hero-background-4k.jpg";
 
 interface MovieHeroProps {
   title: string;
@@ -89,7 +89,7 @@ export const MovieHero = ({
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">imdb Rating</div>
               <div className="flex items-center gap-2">
-                <span className="text-3xl font-bold text-rating-gold">{rating}</span>
+                <span className="text-3xl font-bold text-rating-gold">{rating.toFixed(2)}</span>
                 <span className="text-muted-foreground">/5</span>
               </div>
             </div>
@@ -122,7 +122,19 @@ export const MovieHero = ({
               {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
             </Button>
             )}
-            <Button variant="ghost" size="lg">
+            <Button variant="ghost" size="lg" onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: title,
+                  text: description,
+                  url: window.location.href
+                });
+              } else {
+                // Fallback for browsers that don't support Web Share API
+                navigator.clipboard.writeText(window.location.href);
+                // You could add a toast notification here
+              }
+            }}>
               <Share className="w-5 h-5 mr-2" />
               Share
             </Button>

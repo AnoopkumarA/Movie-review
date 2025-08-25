@@ -18,7 +18,7 @@ export const Footer = () => {
       { name: "Watchlist", href: "/profile", icon: Heart },
     ],
     "Legal": [
-      { name: "Privacy Policy", href: "#", icon: Film },
+      { name: "Privacy Policy", href: "/privacy-policy", icon: Film },
     ],
   };
 

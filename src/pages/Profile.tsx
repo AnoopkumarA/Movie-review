@@ -11,7 +11,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
 import { tmdbImageUrl } from "@/integrations/tmdb/client";
 import { Footer } from "@/components/Footer";
-import { User, Edit, Save, X, Heart, Star, Film, Trash2, Loader2 } from "lucide-react";
+import { User, Edit, Save, X, Star, Film, Trash2, Loader2 } from "lucide-react";
 import { checkSchema } from "@/utils/checkSchema";
 
 const Profile = () => {
@@ -160,7 +160,7 @@ const Profile = () => {
            <div className="flex items-center justify-between mb-6">
              <h2 className="text-2xl font-bold flex items-center gap-3 text-foreground">
                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                 <Heart className="w-5 h-5 text-primary" />
+                 <Film className="w-5 h-5 text-primary" />
                </div>
                Your Interests
              </h2>
@@ -283,7 +283,7 @@ const Profile = () => {
 
           {items.length === 0 ? (
             <div className="text-center py-12">
-              <Heart className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <Film className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
               <p className="text-lg font-medium text-muted-foreground mb-2">Your watchlist is empty</p>
               <p className="text-sm text-muted-foreground mb-4">
                 Start adding movies you want to watch later

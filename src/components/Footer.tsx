@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Star, TrendingUp, Clock, User, Film, Heart } from "lucide-react";
+import { Star, TrendingUp, Clock, User, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -15,7 +15,7 @@ export const Footer = () => {
     ],
     "Account": [
       { name: "Profile", href: "/profile", icon: User },
-      { name: "Watchlist", href: "/profile", icon: Heart },
+              { name: "Watchlist", href: "/profile", icon: Film },
     ],
     "Legal": [
       { name: "Privacy Policy", href: "/privacy-policy", icon: Film },

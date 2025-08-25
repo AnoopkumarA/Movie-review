@@ -1,4 +1,4 @@
-import { Search, Film, Star, TrendingUp, LogIn, LogOut, User } from "lucide-react";
+import { Search, Film, Star, TrendingUp, LogIn, LogOut, User, Menu, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ export const Header = () => {
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<{ id: number; title: string }[]>([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const debounceRef = useRef<number | null>(null);
 
   const handleSignOut = async () => {
@@ -47,7 +48,13 @@ export const Header = () => {
       navigate(`/movie/${results[0].id}`);
       setQuery('');
       setResults([]);
+      setIsMobileMenuOpen(false);
     }
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -57,8 +64,8 @@ export const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="flex items-center gap-2">
-              <Film className="w-8 h-8 text-primary" />
-              <h1 className="text-2xl font-bold bg-gradient-rating bg-clip-text text-transparent">
+              <Film className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+              <h1 className="text-lg md:text-2xl font-bold bg-gradient-rating bg-clip-text text-transparent">
                 MovieVault
               </h1>
             </div>
@@ -67,7 +74,7 @@ export const Header = () => {
             </Badge>
           </Link>
 
-          {/* Search Bar */}
+          {/* Search Bar - Desktop Only */}
           <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
             <form onSubmit={handleSubmit} className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -98,18 +105,25 @@ export const Header = () => {
             </form>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" onClick={() => navigate('/trending')}>
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="default"
+            className="md:hidden p-3"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </Button>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => handleNavigation('/trending')}>
               <TrendingUp className="w-4 h-4 mr-2" />
               Trending
             </Button>
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" onClick={() => navigate('/top-rated')}>
+            <Button variant="ghost" size="sm" onClick={() => handleNavigation('/top-rated')}>
               <Star className="w-4 h-4 mr-2" />
               Top Rated
-            </Button>
-            <Button variant="ghost" size="sm" className="md:hidden">
-              <Search className="w-4 h-4" />
             </Button>
             
             {/* Auth Buttons */}
@@ -135,6 +149,103 @@ export const Header = () => {
             )}
           </nav>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-4 pt-4 border-t border-border">
+            {/* Mobile Search */}
+            <div className="mb-4">
+              <form onSubmit={handleSubmit} className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search movies..."
+                  className="pl-10 bg-secondary/50 border-border focus:bg-secondary"
+                />
+                {query && results.length > 0 && (
+                  <div className="absolute z-50 mt-2 w-full bg-background border rounded-md shadow-lg">
+                    {results.map((r) => (
+                      <button
+                        key={r.id}
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-muted"
+                        onClick={() => {
+                          navigate(`/movie/${r.id}`);
+                          setQuery('');
+                          setResults([]);
+                          setIsMobileMenuOpen(false);
+                        }}
+                      >
+                        {r.title}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </form>
+            </div>
+
+            {/* Mobile Navigation Links */}
+            <div className="space-y-2 mb-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start" 
+                onClick={() => handleNavigation('/trending')}
+              >
+                <TrendingUp className="w-4 h-4 mr-3" />
+                Trending
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start" 
+                onClick={() => handleNavigation('/top-rated')}
+              >
+                <Star className="w-4 h-4 mr-3" />
+                Top Rated
+              </Button>
+            </div>
+
+            {/* Mobile Auth Section */}
+            {loading ? (
+              <div className="flex justify-center py-4">
+                <div className="w-6 h-6 animate-spin rounded-full border-b-2 border-primary"></div>
+              </div>
+            ) : user ? (
+              <div className="space-y-2">
+                <Link 
+                  to="/profile" 
+                  className="flex items-center w-full p-3 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <User className="w-4 h-4 mr-3 text-primary" />
+                  Profile
+                </Link>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start" 
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="w-4 h-4 mr-3" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link 
+                to="/auth" 
+                className="block"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Button variant="default" size="sm" className="w-full">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

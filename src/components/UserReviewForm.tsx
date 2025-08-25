@@ -129,7 +129,7 @@ export const UserReviewForm = ({ movieId, onReviewSubmitted, existingReview }: U
         <Button 
           type="submit" 
           disabled={isSubmitting || rating === 0}
-          className="w-full"
+          className="w-auto"
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">

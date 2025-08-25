@@ -309,22 +309,22 @@ const MovieDetail = () => {
                 {/* Combined Reviews Section */}
         <section className="space-y-8">
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+              <h2 className="text-2xl sm:text-3xl font-bold">
                 TMDB Reviews
                 {(userReviews.length + tmdbReviews.length) > 0 && (
-                  <span className="text-lg font-normal text-muted-foreground ml-2">
+                  <span className="text-base sm:text-lg font-normal text-muted-foreground ml-2">
                     ({userReviews.length + tmdbReviews.length} {(userReviews.length + tmdbReviews.length) === 1 ? 'review' : 'reviews'})
-                  </span>
-                )}
-              </h2>
-              <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-rating-gold" fill="currentColor" />
-                <span className="font-semibold">{overallRating.toFixed(1)}</span>
-                <span className="text-muted-foreground">overall rating</span>
+                </span>
+              )}
+            </h2>
+            <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 text-rating-gold" fill="currentColor" />
+                <span className="font-semibold text-sm sm:text-base">{overallRating.toFixed(1)}</span>
+                <span className="text-muted-foreground text-xs sm:text-sm">overall rating</span>
               </div>
             </div>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Professional critic reviews from TMDB and user reviews from our community
             </p>
           </div>
@@ -358,14 +358,14 @@ const MovieDetail = () => {
                     <div className="flex items-center gap-4">
                       <div className="p-[2px] rounded-full bg-gradient-to-br from-primary/60 via-primary/20 to-transparent">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <User className="w-5 h-5 text-primary" />
+                        <User className="w-5 h-5 text-primary" />
                         </div>
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold">
-                            {review.profiles?.username || 'Anonymous User'}
-                          </h4>
+                        <h4 className="font-semibold">
+                          {review.profiles?.username || 'Anonymous User'}
+                        </h4>
                           <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
                             User Review
                           </Badge>

@@ -22,8 +22,6 @@ const NotFound = () => {
         </a>
       </div>
       
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

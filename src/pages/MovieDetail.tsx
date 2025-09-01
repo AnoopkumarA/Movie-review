@@ -455,15 +455,6 @@ const MovieDetail = () => {
           )}
         </section>
 
-        {/* Ad Space */}
-        <section className="my-16">
-          <Card className="p-8 text-center bg-muted/50 border-dashed">
-            <div className="text-muted-foreground">
-              <p className="text-lg font-medium mb-2">Advertisement Space</p>
-              <p className="text-sm">Google AdSense integration ready</p>
-            </div>
-          </Card>
-        </section>
 
         {/* Movie Details */}
         <section className="space-y-8">

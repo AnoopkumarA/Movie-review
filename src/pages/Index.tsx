@@ -10,6 +10,7 @@ import { TrendingUp, Star, Clock } from "lucide-react";
 import { tmdb, tmdbImageUrl, TmdbMovie } from "@/integrations/tmdb/client";
 import { MovieStats } from "@/components/MovieStats";
 import { Footer } from "@/components/Footer";
+import { AdUnit } from "@/components/AdUnit";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -126,6 +127,13 @@ const Index = () => {
       )}
 
       <div className="container mx-auto px-4 py-12">
+        {/* Ad Space Before Categories */}
+        <section className="mb-12">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
+
         {/* Categories */}
         <section className="mb-12">
           <div className="flex flex-wrap gap-4 mb-8">
@@ -202,11 +210,8 @@ const Index = () => {
 
         {/* Ad Space */}
         <section className="my-16">
-          <Card className="p-8 text-center bg-muted/50 border-dashed">
-            <div className="text-muted-foreground">
-              <p className="text-lg font-medium mb-2">Advertisement Space</p>
-              <p className="text-sm">Google AdSense integration ready - Premium ad placement</p>
-            </div>
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
           </Card>
         </section>
 

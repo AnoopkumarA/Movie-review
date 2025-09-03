@@ -18,6 +18,7 @@ import { ThumbsUp, Calendar, User, Star, Clock, Clapperboard, DollarSign, Trendi
 import { Link } from "react-router-dom";
 import { TrailerModal } from "@/components/TrailerModal";
 import { youtube } from "@/integrations/youtube/client";
+import { AdUnit } from "@/components/AdUnit";
 
 interface UserReview {
   id: string;
@@ -233,6 +234,13 @@ const MovieDetail = () => {
       )}
 
       <div className="container mx-auto px-4 py-12">
+        {/* Ad Section */}
+        <section className="mb-12">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
+
         {/* Cast and Crew Section */}
         {tmdbMovie && (
           <section className="mb-12">
@@ -455,6 +463,7 @@ const MovieDetail = () => {
           )}
         </section>
 
+        
 
         {/* Movie Details */}
         <section className="space-y-8">

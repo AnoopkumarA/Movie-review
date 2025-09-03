@@ -4,6 +4,7 @@ import { MovieCard } from "@/components/MovieCard";
 import { Card } from "@/components/ui/card";
 import { tmdb, tmdbImageUrl, TmdbMovie } from "@/integrations/tmdb/client";
 import { Footer } from "@/components/Footer";
+import { AdUnit } from "@/components/AdUnit";
 
 const Trending = () => {
   const [movies, setMovies] = useState<TmdbMovie[]>([]);
@@ -30,6 +31,11 @@ const Trending = () => {
       <Header />
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-8">Trending Movies</h1>
+        <section className="mb-8">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
         {error && <Card className="p-6 text-destructive">{error}</Card>}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

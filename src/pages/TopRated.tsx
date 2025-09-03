@@ -4,6 +4,7 @@ import { MovieCard } from "@/components/MovieCard";
 import { Card } from "@/components/ui/card";
 import { tmdb, tmdbImageUrl, TmdbMovie } from "@/integrations/tmdb/client";
 import { Footer } from "@/components/Footer";
+import { AdUnit } from "@/components/AdUnit";
 
 const TopRated = () => {
   const [movies, setMovies] = useState<TmdbMovie[]>([]);
@@ -29,7 +30,13 @@ const TopRated = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-4 py-12">
+        <section className="mb-8">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
         <h1 className="text-3xl font-bold mb-8">Top Rated Movies</h1>
+        
         {error && <Card className="p-6 text-destructive">{error}</Card>}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -56,6 +63,15 @@ const TopRated = () => {
           </div>
         )}
       </div>
+
+
+      {/* Ad Space Before Categories */}
+        <section className="mb-12">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
+
       
       {/* Footer */}
       <Footer />

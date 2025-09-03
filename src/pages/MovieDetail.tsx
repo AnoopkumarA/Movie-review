@@ -463,6 +463,14 @@ const MovieDetail = () => {
           )}
         </section>
 
+        {/* Ad Section */}
+        <section className="mb-12">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
+        
+
         
 
         {/* Movie Details */}
@@ -488,13 +496,6 @@ const MovieDetail = () => {
             Share
           </Button>
         </div>
-
-        {/* Ad Section */}
-        <section className="mb-12">
-          <Card className="p-8 bg-muted/10">
-            <AdUnit />
-          </Card>
-        </section>
           
           <div className="grid md:grid-cols-2 gap-8">
             {/* Technical Details - modern stat cards */}

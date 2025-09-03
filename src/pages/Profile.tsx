@@ -13,6 +13,7 @@ import { tmdbImageUrl } from "@/integrations/tmdb/client";
 import { Footer } from "@/components/Footer";
 import { User, Edit, Save, X, Star, Film, Trash2, Loader2 } from "lucide-react";
 import { checkSchema } from "@/utils/checkSchema";
+import { AdUnit } from "@/components/AdUnit";
 
 const Profile = () => {
   const { items, remove } = useWatchlist();
@@ -268,6 +269,14 @@ const Profile = () => {
             </>
           )}
         </Card>
+
+
+         {/* Ad Space Before Categories */}
+        <section className="mb-12">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
 
         {/* Watchlist Section */}
         <Card className="p-6">

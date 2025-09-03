@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Film, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/Footer';
+import { AdUnit } from '@/components/AdUnit';
 
 const Auth = () => {
   const { user, signIn, signUp, loading } = useAuth();
@@ -80,7 +81,7 @@ const Auth = () => {
       <div className="absolute inset-0 bg-gradient-subtle opacity-50"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,hsl(var(--primary))_0%,transparent_50%)] opacity-10"></div>
       
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 gap-8">
         <Card className="w-full max-w-md p-8 bg-card/80 backdrop-blur-md border-border/50">
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-8">
@@ -195,6 +196,9 @@ const Auth = () => {
               </Button>
             </div>
           </form>
+        </Card>
+        <Card className="w-full max-w-md p-8 bg-muted/10">
+          <AdUnit />
         </Card>
       </div>
       

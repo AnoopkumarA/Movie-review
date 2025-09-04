@@ -18,6 +18,7 @@ import { ThumbsUp, Calendar, User, Star, Clock, Clapperboard, DollarSign, Trendi
 import { Link } from "react-router-dom";
 import { TrailerModal } from "@/components/TrailerModal";
 import { youtube } from "@/integrations/youtube/client";
+import { InArticleAd, DisplayAd } from "@/components/ads/AdUnits";
 import { AdUnit } from "@/components/AdUnit";
 
 interface UserReview {
@@ -320,7 +321,7 @@ const MovieDetail = () => {
             <AdUnit />
           </Card>
         </section>
-        
+
                 {/* Combined Reviews Section */}
         <section className="space-y-8">
           <div className="space-y-2">

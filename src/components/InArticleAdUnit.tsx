@@ -6,6 +6,7 @@ declare global {
   }
 }
 
+
 export const InArticleAdUnit = () => {
   useEffect(() => {
     try {
@@ -28,3 +29,4 @@ export const InArticleAdUnit = () => {
     />
   );
 };
+

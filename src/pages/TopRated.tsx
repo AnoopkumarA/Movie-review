@@ -36,6 +36,13 @@ const TopRated = () => {
           </Card>
         </section>
         <h1 className="text-3xl font-bold mb-8">Top Rated Movies</h1>
+
+        <section className="mb-8">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
+        
         
         {error && <Card className="p-6 text-destructive">{error}</Card>}
         {loading ? (

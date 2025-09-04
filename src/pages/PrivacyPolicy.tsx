@@ -1,20 +1,19 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
-import { InArticleAd, DisplayAd } from "@/components/ads/AdUnits";
+import { AdUnit } from "@/components/AdUnit";
+import { InArticleAdUnit } from "@/components/InArticleAdUnit";
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-4 py-12">
-        {/* Display Ad at Top */}
         <section className="mb-8 max-w-4xl mx-auto">
           <Card className="p-8 bg-muted/10">
-            <DisplayAd />
+            <AdUnit />
           </Card>
         </section>
-        
         <Card className="p-8 max-w-4xl mx-auto">
           <div className="prose prose-gray max-w-none">
             <h1 className="text-4xl font-bold text-foreground mb-6">Privacy Policy</h1>
@@ -258,13 +257,6 @@ const PrivacyPolicy = () => {
               If We need to rely on consent as a legal basis for processing Your information and Your country requires consent from a parent, We may require Your parent's consent before We collect and use that information.
             </p>
             
-            {/* In-Article Ad */}
-            <section className="my-8">
-              <Card className="p-8 bg-muted/10">
-                <InArticleAd />
-              </Card>
-            </section>
-
             <h2 className="text-2xl font-bold text-foreground mt-8 mb-4">Links to Other Websites</h2>
             <p className="text-foreground mb-4">
               Our Service may contain links to other websites that are not operated by Us. If You click on a third party link, You will be directed to that third party's site. We strongly advise You to review the Privacy Policy of every site You visit.
@@ -283,13 +275,6 @@ const PrivacyPolicy = () => {
             <p className="text-foreground mb-6">
               You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.
             </p>
-
-            {/* In-Article Ad */}
-            <section className="my-8">
-              <Card className="p-8 bg-muted/10">
-                <InArticleAd />
-              </Card>
-            </section>
             
             <h2 className="text-2xl font-bold text-foreground mt-8 mb-4">Contact Us</h2>
             <p className="text-foreground mb-4">If you have any questions about this Privacy Policy, You can contact us:</p>
@@ -298,6 +283,13 @@ const PrivacyPolicy = () => {
             </ul>
           </div>
         </Card>
+
+        {/* In-Article Ad */}
+        <section className="my-8 max-w-4xl mx-auto">
+          <Card className="p-8 bg-muted/10">
+            <InArticleAdUnit />
+          </Card>
+        </section>
       </div>
       <Footer />
     </div>

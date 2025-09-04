@@ -314,6 +314,13 @@ const MovieDetail = () => {
           </section>
         )}
 
+
+        <section className="mb-8">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit />
+          </Card>
+        </section>
+        
                 {/* Combined Reviews Section */}
         <section className="space-y-8">
           <div className="space-y-2">

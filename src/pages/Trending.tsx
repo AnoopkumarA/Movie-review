@@ -68,6 +68,12 @@ const Trending = () => {
           </div>
         )}
       </div>
+
+      <section className="mb-8">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit2 />
+          </Card>
+        </section>
       
       {/* Footer */}
       <Footer />

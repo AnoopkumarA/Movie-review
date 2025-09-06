@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { tmdb, tmdbImageUrl, TmdbMovie } from "@/integrations/tmdb/client";
 import { Footer } from "@/components/Footer";
 import { AdUnit } from "@/components/AdUnit";
+import { AdUnit2 } from "@/components/AdUnit2";
 
 const Trending = () => {
   const [movies, setMovies] = useState<TmdbMovie[]>([]);
@@ -34,6 +35,11 @@ const Trending = () => {
         <section className="mb-8">
           <Card className="p-8 bg-muted/10">
             <AdUnit />
+          </Card>
+        </section>
+        <section className="mb-8">
+          <Card className="p-8 bg-muted/10">
+            <AdUnit2 />
           </Card>
         </section>
         {error && <Card className="p-6 text-destructive">{error}</Card>}
@@ -70,6 +76,5 @@ const Trending = () => {
 };
 
 export default Trending;
-
 
 

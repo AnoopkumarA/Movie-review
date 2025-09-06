@@ -9,6 +9,7 @@ import { Film, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/Footer';
 import { AdUnit } from '@/components/AdUnit';
+import { AdUnit2 } from '@/components/AdUnit2';
 
 const Auth = () => {
   const { user, signIn, signUp, loading } = useAuth();
@@ -199,6 +200,9 @@ const Auth = () => {
         </Card>
         <Card className="w-full max-w-md p-8 bg-muted/10">
           <AdUnit />
+        </Card>
+        <Card className="w-full max-w-md mt-4 p-8 bg-muted/10">
+          <AdUnit2 />
         </Card>
       </div>
       

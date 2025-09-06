@@ -201,11 +201,9 @@ const Auth = () => {
         <Card className="w-full max-w-md p-8 bg-muted/10">
           <AdUnit />
         </Card>
-        <section className="mb-8">
-          <Card className="p-8 bg-muted/10">
-            <AdUnit2 />
-          </Card>
-        </section>
+        <Card className="w-full max-w-md mt-4 p-8 bg-muted/10">
+          <AdUnit2 />
+        </Card>
       </div>
       
       {/* Footer */}

@@ -20,7 +20,7 @@ export const AdUnit = () => {
   return (
     <ins
       className="adsbygoogle"
-      style={{ display: 'block' }}
+      style={{ display: 'block', width: '100%', height: '250px', minWidth: '300px' }}
       data-ad-client="ca-pub-9962210800771864"
       data-ad-slot="8895126316"
       data-ad-format="auto"

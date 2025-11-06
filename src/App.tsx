@@ -12,6 +12,10 @@ import Profile from "./pages/Profile";
 import Trending from "./pages/Trending";
 import TopRated from "./pages/TopRated";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import TermsOfService from "./pages/TermsOfService";
+import Blog from "./pages/Blog";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +34,10 @@ const App = () => (
             <Route path="/trending" element={<Trending />} />
             <Route path="/top-rated" element={<TopRated />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/blog" element={<Blog />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

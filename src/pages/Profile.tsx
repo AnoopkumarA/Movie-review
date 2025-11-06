@@ -75,7 +75,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-6 md:px-8 lg:px-10 xl:px-14 py-12 max-w-[1640px]">
         {/* Profile Header */}
         <Card className="p-8 mb-8 bg-gradient-to-br from-background to-primary/5 border border-primary/10">
           {profileLoading ? (

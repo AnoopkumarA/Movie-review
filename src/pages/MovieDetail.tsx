@@ -2,11 +2,9 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { MovieHero } from "@/components/MovieHero";
-import { StarRating } from "@/components/StarRating";
 import { UserReviewForm } from "@/components/UserReviewForm";
 import { CastAndCrew } from "@/components/CastAndCrew";
 import { Footer } from "@/components/Footer";
-import { MovieImageGallery } from "@/components/MovieImageGallery";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +16,6 @@ import { ThumbsUp, Calendar, User, Star, Clock, Clapperboard, DollarSign, Trendi
 import { Link } from "react-router-dom";
 import { TrailerModal } from "@/components/TrailerModal";
 import { youtube } from "@/integrations/youtube/client";
-import { InArticleAd, DisplayAd } from "@/components/ads/AdUnits";
 import { AdUnit } from "@/components/AdUnit";
 
 interface UserReview {
@@ -40,8 +37,6 @@ const MovieDetail = () => {
   const [creditsCast, setCreditsCast] = useState<TmdbCredit[]>([]);
   const [creditsCrew, setCreditsCrew] = useState<TmdbCredit[]>([]);
   const [tmdbReviews, setTmdbReviews] = useState<TmdbReview[]>([]);
-  const [backdropUrls, setBackdropUrls] = useState<string[]>([]);
-  const [posterUrls, setPosterUrls] = useState<string[]>([]);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [trailerVideoId, setTrailerVideoId] = useState<string | null>(null);
   const [userReviews, setUserReviews] = useState<UserReview[]>([]);
@@ -101,18 +96,15 @@ const MovieDetail = () => {
     if (!id) return;
     try {
       setLoading(true);
-      const [details, creditsRes, reviewsRes, imagesRes] = await Promise.all([
+      const [details, creditsRes, reviewsRes] = await Promise.all([
         tmdb.getMovieDetails(id),
         tmdb.getMovieCredits(id),
         tmdb.getMovieReviews(id),
-        tmdb.getMovieImages(id),
       ]);
       setTmdbMovie(details);
       setCreditsCast(creditsRes.cast || []);
       setCreditsCrew(creditsRes.crew || []);
       setTmdbReviews(reviewsRes.results || []);
-      setBackdropUrls((imagesRes.backdrops || []).slice(0, 12).map(img => tmdbImageUrl(img.file_path, 'original')!).filter(Boolean));
-      setPosterUrls((imagesRes.posters || []).slice(0, 12).map(img => tmdbImageUrl(img.file_path, 'original')!).filter(Boolean));
       computeOverallRating(details, userReviews);
     } catch (e) {
       console.error('Error fetching TMDB data:', e);
@@ -234,7 +226,7 @@ const MovieDetail = () => {
         />
       )}
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-6 md:px-8 lg:px-10 xl:px-14 py-12 max-w-[1640px]">
         {/* Ad Section */}
         <section className="mb-12">
           <Card className="p-8 bg-muted/10">
@@ -272,18 +264,6 @@ const MovieDetail = () => {
                 <CastAndCrew castAndCrew={[...castMembers, ...crewMembers]} />
               );
             })()}
-          </section>
-        )}
-
-        {/* Image Galleries */}
-        {(backdropUrls.length > 0 || posterUrls.length > 0) && (
-          <section className="mb-12 space-y-8">
-            {backdropUrls.length > 0 && (
-              <MovieImageGallery imageUrls={backdropUrls} title="Backdrops" />
-            )}
-            {posterUrls.length > 0 && (
-              <MovieImageGallery imageUrls={posterUrls} title="Posters" />
-            )}
           </section>
         )}
 
@@ -327,7 +307,7 @@ const MovieDetail = () => {
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
               <h2 className="text-2xl sm:text-3xl font-bold">
-                TMDB Reviews
+                Community Reviews
                 {(userReviews.length + tmdbReviews.length) > 0 && (
                   <span className="text-base sm:text-lg font-normal text-muted-foreground ml-2">
                     ({userReviews.length + tmdbReviews.length} {(userReviews.length + tmdbReviews.length) === 1 ? 'review' : 'reviews'})
@@ -341,7 +321,7 @@ const MovieDetail = () => {
               </div>
             </div>
             <p className="text-muted-foreground text-xs sm:text-sm">
-              Professional critic reviews from TMDB and user reviews from our community
+              Reviews and ratings from movie enthusiasts and critics worldwide
             </p>
           </div>
 

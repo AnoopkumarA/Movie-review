@@ -126,7 +126,7 @@ const Index = () => {
         />
       )}
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-6 md:px-8 lg:px-10 xl:px-14 py-12 max-w-[1640px]">
         {/* Ad Space Before Categories */}
         <section className="mb-12">
           <Card className="p-8 bg-muted/10">

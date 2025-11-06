@@ -59,7 +59,7 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-6 md:px-8 lg:px-10 xl:px-14 py-4 max-w-[1640px]">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">

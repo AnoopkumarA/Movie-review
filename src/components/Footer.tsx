@@ -15,10 +15,16 @@ export const Footer = () => {
     ],
     "Account": [
       { name: "Profile", href: "/profile", icon: User },
-              { name: "Watchlist", href: "/profile", icon: Film },
+      { name: "Watchlist", href: "/profile", icon: Film },
+    ],
+    "Company": [
+      { name: "About Us", href: "/about", icon: Film },
+      { name: "Blog", href: "/blog", icon: Film },
+      { name: "Contact", href: "/contact", icon: User },
     ],
     "Legal": [
       { name: "Privacy Policy", href: "/privacy-policy", icon: Film },
+      { name: "Terms of Service", href: "/terms-of-service", icon: Film },
     ],
   };
 
@@ -26,7 +32,7 @@ export const Footer = () => {
     <footer className="bg-background border-t border-border/50 mt-20">
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Logo and Description */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -87,6 +93,27 @@ export const Footer = () => {
             </ul>
           </div>
 
+          {/* Company Section */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">Company</h3>
+            <ul className="space-y-2">
+              {footerLinks["Company"].map((link) => {
+                const Icon = link.icon;
+                return (
+                  <li key={link.name}>
+                    <Link
+                      to={link.href}
+                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                    >
+                      <Icon className="w-4 h-4" />
+                      {link.name}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
           {/* Legal Section */}
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">Legal</h3>
@@ -109,25 +136,6 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Newsletter Signup */}
-        <div className="mt-12 pt-8 border-t border-border/30">
-          <div className="max-w-md">
-            <h3 className="font-semibold text-foreground mb-2">Stay Updated</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Get notified about new movie releases and trending films.
-            </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-3 py-2 text-sm bg-muted border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-rating-gold/50 focus:border-rating-gold"
-              />
-              <Button size="sm" className="bg-rating-gold hover:bg-rating-gold/90 text-background">
-                Subscribe
-              </Button>
-            </div>
-          </div>
-        </div>
       </div>
 
              {/* Bottom Footer */}

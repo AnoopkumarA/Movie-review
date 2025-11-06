@@ -29,7 +29,7 @@ const TopRated = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-6 md:px-8 lg:px-10 xl:px-14 py-12 max-w-[1640px]">
         <section className="mb-8">
           <Card className="p-8 bg-muted/10">
             <AdUnit />

@@ -48,7 +48,7 @@ export const MovieHero = ({
     }
   };
   return (
-    <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center">
+    <section className="relative min-h-screen flex items-center">
       {/* Background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -57,7 +57,7 @@ export const MovieHero = ({
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40 md:from-background md:via-background/80 md:to-background/40" />
       
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
+      <div className="relative z-10 container mx-auto px-6 md:px-8 lg:px-10 xl:px-14 py-12 md:py-20 max-w-[1640px]">
         <div className="max-w-3xl space-y-6">
           {/* Genre Tags */}
           <div className="flex flex-wrap gap-2">
@@ -70,7 +70,7 @@ export const MovieHero = ({
 
           {/* Title */}
           <div className="space-y-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-foreground leading-tight">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-foreground leading-tight">
               {title}
             </h1>
             
@@ -86,12 +86,12 @@ export const MovieHero = ({
           </div>
 
           {/* Ratings */}
-          <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 sm:gap-6">
+          <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 sm:gap-8">
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">imdb Rating</div>
               <div className="flex items-center gap-2">
-                <span className="text-2xl sm:text-3xl font-bold text-rating-gold">{rating.toFixed(2)}</span>
-                <span className="text-muted-foreground">/5</span>
+                <span className="text-4xl sm:text-5xl font-bold text-rating-gold">{rating.toFixed(2)}</span>
+                <span className="text-base text-muted-foreground">/5</span>
               </div>
             </div>
             <div className="space-y-1">
@@ -113,17 +113,17 @@ export const MovieHero = ({
 
           {/* Action Buttons */}
           <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 sm:gap-4 pt-4">
-            <Button size="default" className="w-full sm:w-auto sm:size-lg bg-primary hover:bg-primary/90 shadow-rating" onClick={onWatchTrailer}>
+            <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 shadow-rating" onClick={onWatchTrailer}>
               <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Watch Trailer
             </Button>
             {effectiveMovieId && (
-            <Button variant="outline" size="default" className="w-full sm:w-auto sm:size-lg" onClick={toggleWatchlist}>
+            <Button variant="outline" size="lg" className="w-full sm:w-auto" onClick={toggleWatchlist}>
               {inWatchlist ? <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /> : <Bookmark className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />}
               {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
             </Button>
             )}
-            <Button variant="ghost" size="default" className="w-full sm:w-auto sm:size-lg col-span-2 sm:col-span-1" onClick={() => {
+            <Button variant="ghost" size="lg" className="w-full sm:w-auto col-span-2 sm:col-span-1" onClick={() => {
               if (navigator.share) {
                 navigator.share({
                   title: title,

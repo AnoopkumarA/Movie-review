@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, ArrowRight, Film, Heart, Star, Shield, Award, Users, Sparkles, Drama, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 // ============================================
 // 🎯 PRIORITY: ADD YOUR ORIGINAL BLOG ARTICLES HERE
@@ -33,8 +34,7 @@ import { Link } from "react-router-dom";
 // }
 // ============================================
 
-// Export blogArticles so it can be used in BlogArticle.tsx
-export const blogArticles = [
+const blogArticles = [
   {
     id: "shawshank-redemption-thoughts",
     title: "Why The Shawshank Redemption Stays With Me",
@@ -121,6 +121,14 @@ const categories = ["All", "Personal Favorites", "Film Analysis", "Film History"
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const { toast } = useToast();
+
+  const handleArticleClick = () => {
+    toast({
+      title: "Coming Soon!",
+      description: "Full article content is being written. Stay tuned for updates!",
+    });
+  };
 
   // Filter articles based on selected category
   const filteredArticles = useMemo(() => {
@@ -215,11 +223,9 @@ const Blog = () => {
                       })}</span>
                     </div>
                   </div>
-                  <Link to={`/blog/${featuredArticle.id}`}>
-                    <Button className="w-fit">
-                      Read Article <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
+                  <Button className="w-fit" onClick={handleArticleClick}>
+                    Read Article <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
                  </div>
                </div>
              </Card>
@@ -268,11 +274,9 @@ const Blog = () => {
                       })}</span>
                     </div>
                   </div>
-                  <Link to={`/blog/${article.id}`}>
-                    <Button variant="ghost" className="w-full">
-                      Read More <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
+                  <Button variant="ghost" className="w-full" onClick={handleArticleClick}>
+                    Read More <ArrowRight className="w-4 h-4 ml-2" />
+                   </Button>
                  </div>
                </Card>
                  );
